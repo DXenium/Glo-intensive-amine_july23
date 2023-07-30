@@ -1,23 +1,4 @@
-// Функция получает данные из файла db.json внутри проекта
-
-//const mainData = () => {
-//     fetch('./db.json')
-//         .then((response) => {
-//             return response.json()
-//         })
-//         .then((data) => {
-//             console.log(data.anime);
-//         })
-// }
-
-// mainData()
-
-
-
-// Функция получает данные из облачного хранилища firebase
-
-
-const mainData = () => {
+const categoriesData = () => {
 
     const preloder = document.querySelector('.preloder');
 
@@ -33,12 +14,12 @@ const mainData = () => {
     }
 
     const renderAnimeList = (array, ganres) => {
-        const wrapper = document.querySelector('.product .col-lg-8')
+        const wrapper = document.querySelector('.product-page .col-lg-8')
 
         ganres.forEach((ganre) => {
             const productBlock = document.createElement('div') //создаем блок для сортировки по жанрам
             const listBlock = document.createElement('div')//создаем блок для вывода контента внутри блока
-            const list = array.filter(item => item.ganre === ganre)
+            const list = array.filter(item => item.tags.includes(ganre));
 
             listBlock.classList.add('row')
             productBlock.classList.add('mb-5') //добавляем класс, который добавит отступ снизу(margin-bottom)
@@ -120,6 +101,7 @@ const mainData = () => {
         .then((response) => response.json())
         .then((data) => {
             const ganres = new Set();
+            const rangeParams = new URLSearchParams(window.location.search).get('ganre')
 
             data.forEach((item) => {
                 ganres.add(item.ganre)
@@ -127,10 +109,13 @@ const mainData = () => {
             })
 
             renderTopAnime(data.sort((a, b) => b.views - a.views).slice(0, 5));  // сортируем массив по параметру "просмотры/views" от большего к меньшему, обрезам первые 5 элементов от 0 до 5
-            renderAnimeList(data, ganres);
+            if (rangeParams) {
+                renderAnimeList(data, [rangeParams]);
+            } else {
+                renderAnimeList(data, ganres);
+            }
             renderGanreList(ganres);
         })
 }
 
-mainData()
-
+categoriesData()
